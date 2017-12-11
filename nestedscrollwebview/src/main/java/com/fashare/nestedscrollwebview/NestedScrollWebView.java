@@ -8,30 +8,29 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
-import android.view.ViewParent;
 import android.webkit.WebView;
 
 /**
  * Created by apple on 2017/12/11.
  */
 
-public class NestedScrollWebview extends WebView implements NestedScrollingChild {
-    private static final String TAG = "NestedScrollWebview";
+public class NestedScrollWebView extends WebView implements NestedScrollingChild {
+    private static final String TAG = "NestedScrollWebView";
     /**
      * Sentinel value for no current active pointer.
      * Used by {@link #mActivePointerId}.
      */
     private static final int INVALID_POINTER = -1;
 
-    public NestedScrollWebview(Context context) {
+    public NestedScrollWebView(Context context) {
         this(context, null);
     }
 
-    public NestedScrollWebview(Context context, AttributeSet attrs) {
+    public NestedScrollWebView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public NestedScrollWebview(Context context, AttributeSet attrs, int defStyleAttr) {
+    public NestedScrollWebView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView();
     }
@@ -69,14 +68,14 @@ public class NestedScrollWebview extends WebView implements NestedScrollingChild
     public boolean onTouchEvent(MotionEvent ev) {
 //        initVelocityTrackerIfNotExists();
 
-        MotionEvent vtev = MotionEvent.obtain(ev);
+//        MotionEvent vtev = MotionEvent.obtain(ev);
 
         final int actionMasked = ev.getActionMasked();
 
         if (actionMasked == MotionEvent.ACTION_DOWN) {
             mNestedYOffset = 0;
         }
-        vtev.offsetLocation(0, mNestedYOffset);
+//        vtev.offsetLocation(0, mNestedYOffset);
 
         switch (actionMasked) {
             case MotionEvent.ACTION_DOWN:
@@ -113,22 +112,22 @@ public class NestedScrollWebview extends WebView implements NestedScrollingChild
                 int deltaY = mLastMotionY - y;
                 if (dispatchNestedPreScroll(0, deltaY, mScrollConsumed, mScrollOffset)) {
                     deltaY -= mScrollConsumed[1];
-                    vtev.offsetLocation(0, mScrollOffset[1]);
+//                    vtev.offsetLocation(0, mScrollOffset[1]);
                     mNestedYOffset += mScrollOffset[1];
                 }
-                if (!mIsBeingDragged && Math.abs(deltaY) > mTouchSlop) {
-                    final ViewParent parent = getParent();
-                    if (parent != null) {
-                        parent.requestDisallowInterceptTouchEvent(true);
-                    }
-                    mIsBeingDragged = true;
-                    if (deltaY > 0) {
-                        deltaY -= mTouchSlop;
-                    } else {
-                        deltaY += mTouchSlop;
-                    }
-                }
-                if (mIsBeingDragged) {
+//                if (!mIsBeingDragged && Math.abs(deltaY) > mTouchSlop) {
+//                    final ViewParent parent = getParent();
+//                    if (parent != null) {
+//                        parent.requestDisallowInterceptTouchEvent(true);
+//                    }
+//                    mIsBeingDragged = true;
+//                    if (deltaY > 0) {
+//                        deltaY -= mTouchSlop;
+//                    } else {
+//                        deltaY += mTouchSlop;
+//                    }
+//                }
+//                if (mIsBeingDragged) {
                     // Scroll to follow the motion event
                     mLastMotionY = y - mScrollOffset[1];
 
@@ -146,11 +145,11 @@ public class NestedScrollWebview extends WebView implements NestedScrollingChild
 //                        mVelocityTracker.clear();
 //                    }
 
-                    final int scrolledDeltaY = getScrollY() - oldY;
+                    final int scrolledDeltaY = Math.max(0, oldY + deltaY) - oldY;
                     final int unconsumedY = deltaY - scrolledDeltaY;
                     if (dispatchNestedScroll(0, scrolledDeltaY, 0, unconsumedY, mScrollOffset)) {
                         mLastMotionY -= mScrollOffset[1];
-                        vtev.offsetLocation(0, mScrollOffset[1]);
+//                        vtev.offsetLocation(0, mScrollOffset[1]);
                         mNestedYOffset += mScrollOffset[1];
                     }
 //                    else if (canOverscroll) {
@@ -175,7 +174,7 @@ public class NestedScrollWebview extends WebView implements NestedScrollingChild
 //                            ViewCompat.postInvalidateOnAnimation(this);
 //                        }
 //                    }
-                }
+//                }
                 break;
             case MotionEvent.ACTION_UP:
 //                final VelocityTracker velocityTracker = mVelocityTracker;
@@ -215,8 +214,8 @@ public class NestedScrollWebview extends WebView implements NestedScrollingChild
 //        if (mVelocityTracker != null) {
 //            mVelocityTracker.addMovement(vtev);
 //        }
-        vtev.recycle();
-        return true;
+//        vtev.recycle();
+        return super.onTouchEvent(ev);
     }
 
     private void endDrag() {
